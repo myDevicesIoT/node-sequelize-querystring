@@ -9,13 +9,16 @@ const arrayHave = (v) => { return v.split(' ').map(v => { return isNaN(v) && typ
  * @description helper function used to construct query objects
  * (replacing _.set() to avoid importing all of underscore)
  */
-const deepPropSet = (obj, dotPath, key, val) => {
+const deepPropSet = (root, dotPath, key, val) => {
   const props = dotPath.split('.')
-  let here = obj
+  const obj = {};
+  let here = obj;
   props.forEach((prop, i) => {
     here = (here[prop] = here[prop] || {})
   })
-  here[key] = val
+  here[key] = val;
+  root['$and'] = (root['$and'] || [])
+  root['$and'].push(obj);
 }
 
 /** @class
