@@ -173,6 +173,22 @@ describe('Convert query strings into Sequelize find queries.', (done) => {
     expect(where.name).to.have.property(sequelize.Op.like, 'ric_r%o')
   })
 
+  it('(like) Like operator keeps an ampersand in the value.', () => {
+    let qs = 'name like %Temp & Humidity (Raw & Cal)%'
+    let where = sqs.find(qs)
+    expect(where).to.have.deep.property('name.$like', '%Temp & Humidity (Raw & Cal)%')
+    // test symbolic
+    where = sqsSym.find(qs)
+    expect(where.name).to.have.property(sequelize.Op.like, '%Temp & Humidity (Raw & Cal)%')
+  })
+
+  it('(like) Ampersand value next to another expression.', () => {
+    let qs = 'is_public eq 1, name like %Temp & Humidity%'
+    let where = sqsSym.find(qs)
+    expect(where.is_public).to.have.property(sequelize.Op.eq, '1')
+    expect(where.name).to.have.property(sequelize.Op.like, '%Temp & Humidity%')
+  })
+
   it('(iLike) case insensitive Like operator to search partial string value.', () => {
     let qs = 'name iLike ricardo%'
     let where = sqs.find(qs)
